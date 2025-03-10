@@ -47,8 +47,12 @@ cl = CustomList()  # Create an instance of CustomList
 
 cl.append(5)  # Add element 5 to the list
 print(f"Element at index 0: {cl.get(0)}")  # Retrieve element at index 0
+cl.append(20) # add element 20 to the list
+print(f"Element at index 1: {cl.get(1)}")  # Retrieve element at index 1
+cl.append(25) # add element 25 to the list
+print(f"Element at index 2: {cl.get(2)}")  # Retrieve element at index 2
+
 
 cl.set(0, 10)  # Replace element at index 0 with 10
 print(f"Element at index 0: {cl.get(0)}")  # Retrieve the updated element
-
 print(f"Current size: {cl.size()}")  # Check the current size of the list
