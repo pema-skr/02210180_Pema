@@ -3,89 +3,24 @@
 # Implemented by: 02210167 Jigme Choden Ghalley
 # Partner: 02210180 Pema TChecki 
 
-# Partner 2: Red-Black Tree implementation
-
-RED = True
-BLACK = False
-
-class Node:
-    def __init__(self, data):
-        self.data = data
-        self.color = RED
-        self.left = None
-        self.right = None
-        self.parent = None
 
 class RedBlackTree:
+    class Node:
+        def __init__(self, value, color='R'):
+            self.value = value
+            self.color = color  # 'R' = Red, 'B' = Black
+            self.left = None
+            self.right = None
+            self.parent = None
+
     def __init__(self):
-        self.NIL = Node(None)
-        self.NIL.color = BLACK
-        self.root = self.NIL
+        self.TNULL = self.Node(value=None, color='B')
+        self.root = self.TNULL
 
-    def insert(self, data):
-        new_node = Node(data)
-        new_node.left = self.NIL
-        new_node.right = self.NIL
-
-        parent = None
-        current = self.root
-
-        while current != self.NIL:
-            parent = current
-            if new_node.data < current.data:
-                current = current.left
-            else:
-                current = current.right
-
-        new_node.parent = parent
-
-        if parent is None:
-            self.root = new_node
-        elif new_node.data < parent.data:
-            parent.left = new_node
-        else:
-            parent.right = new_node
-
-        new_node.color = RED
-        self.fix_insert(new_node)
-
-    def fix_insert(self, node):
-        while node != self.root and node.parent.color == RED:
-            if node.parent == node.parent.parent.left:
-                uncle = node.parent.parent.right
-                if uncle.color == RED:
-                    node.parent.color = BLACK
-                    uncle.color = BLACK
-                    node.parent.parent.color = RED
-                    node = node.parent.parent
-                else:
-                    if node == node.parent.right:
-                        node = node.parent
-                        self.left_rotate(node)
-                    node.parent.color = BLACK
-                    node.parent.parent.color = RED
-                    self.right_rotate(node.parent.parent)
-            else:
-                uncle = node.parent.parent.left
-                if uncle.color == RED:
-                    node.parent.color = BLACK
-                    uncle.color = BLACK
-                    node.parent.parent.color = RED
-                    node = node.parent.parent
-                else:
-                    if node == node.parent.left:
-                        node = node.parent
-                        self.right_rotate(node)
-                    node.parent.color = BLACK
-                    node.parent.parent.color = RED
-                    self.left_rotate(node.parent.parent)
-
-        self.root.color = BLACK
-
-    def left_rotate(self, x):
+    def rotate_left(self, x):
         y = x.right
         x.right = y.left
-        if y.left != self.NIL:
+        if y.left != self.TNULL:
             y.left.parent = x
         y.parent = x.parent
         if x.parent is None:
@@ -97,10 +32,10 @@ class RedBlackTree:
         y.left = x
         x.parent = y
 
-    def right_rotate(self, x):
+    def rotate_right(self, x):
         y = x.left
         x.left = y.right
-        if y.right != self.NIL:
+        if y.right != self.TNULL:
             y.right.parent = x
         y.parent = x.parent
         if x.parent is None:
@@ -112,45 +47,118 @@ class RedBlackTree:
         y.right = x
         x.parent = y
 
-    def search(self, value):
-        return self._search_tree(self.root, value)
+    def insert(self, value):
+        new_node = self.Node(value)
+        new_node.left = self.TNULL
+        new_node.right = self.TNULL
 
-    def _search_tree(self, node, value):
-        if node == self.NIL or value == node.data:
-            return node != self.NIL
-        if value < node.data:
-            return self._search_tree(node.left, value)
-        return self._search_tree(node.right, value)
+        y = None
+        x = self.root
+        while x != self.TNULL:
+            y = x
+            if new_node.value < x.value:
+                x = x.left
+            else:
+                x = x.right
+
+        new_node.parent = y
+        if y is None:
+            self.root = new_node
+        elif new_node.value < y.value:
+            y.left = new_node
+        else:
+            y.right = new_node
+
+        new_node.color = 'R'
+        self.fix_insert(new_node)
+
+    def fix_insert(self, k):
+        while k != self.root and k.parent.color == 'R':
+            if k.parent == k.parent.parent.left:
+                u = k.parent.parent.right
+                if u.color == 'R':
+                    u.color = 'B'
+                    k.parent.color = 'B'
+                    k.parent.parent.color = 'R'
+                    k = k.parent.parent
+                else:
+                    if k == k.parent.right:
+                        k = k.parent
+                        self.rotate_left(k)
+                    k.parent.color = 'B'
+                    k.parent.parent.color = 'R'
+                    self.rotate_right(k.parent.parent)
+            else:
+                u = k.parent.parent.left
+                if u.color == 'R':
+                    u.color = 'B'
+                    k.parent.color = 'B'
+                    k.parent.parent.color = 'R'
+                    k = k.parent.parent
+                else:
+                    if k == k.parent.left:
+                        k = k.parent
+                        self.rotate_right(k)
+                    k.parent.color = 'B'
+                    k.parent.parent.color = 'R'
+                    self.rotate_left(k.parent.parent)
+        self.root.color = 'B'
+
+    def search(self, value):
+        return self._search(self.root, value)
+
+    def _search(self, node, value):
+        if node == self.TNULL or value == node.value:
+            return node
+        if value < node.value:
+            return self._search(node.left, value)
+        return self._search(node.right, value)
 
     def get_black_height(self):
-        node = self.root
-        height = 0
-        while node != self.NIL:
-            if node.color == BLACK:
-                height += 1
-            node = node.left
-        return height
+        return self._get_black_height(self.root)
 
-    def print_tree(self, node=None, indent="", last=True):
-        if node is None:
-            node = self.root
-        if node != self.NIL:
-            print(indent, "`- " if last else "|- ", f"{node.data} ({'B' if node.color == BLACK else 'R'})", sep="")
-            indent += "   " if last else "|  "
-            self.print_tree(node.left, indent, False)
-            self.print_tree(node.right, indent, True)
+    def _get_black_height(self, node):
+        if node == self.TNULL:
+            return 1
+        left_height = self._get_black_height(node.left)
+        right_height = self._get_black_height(node.right)
+        if left_height != right_height:
+            raise ValueError("Tree is unbalanced")
+        return left_height + (1 if node.color == 'B' else 0)
 
-# Example usage:
-if __name__ == "__main__":
-    rb_tree = RedBlackTree()
-    rb_tree.insert(10)
-    rb_tree.insert(20)
-    rb_tree.insert(30)
-    rb_tree.insert(15)
-    rb_tree.insert(25)
+    def print_tree(self):
+        # Helper function to print the tree like a pyramid
+        def _print(node, level=0, indent="   "):
+            if node != self.TNULL:
+                # Print the current node with its color
+                color = "Red" if node.color == 'R' else "Black"
+                print(f"{' ' * (level * 4)}{node.value} ({color})")
+                
+                # Recursively print the left and right children with indentation
+                if node.left != self.TNULL or node.right != self.TNULL:
+                    if node.left != self.TNULL:
+                        print(f"{' ' * (level * 4)}L: ", end="")
+                        _print(node.left, level + 1)
+                    if node.right != self.TNULL:
+                        print(f"{' ' * (level * 4)}R: ", end="")
+                        _print(node.right, level + 1)
 
-    print("Red-Black Tree:")
-    rb_tree.print_tree()
+        # Print the tree starting from the root
+        _print(self.root)
 
-    print("Search 15:", rb_tree.search(15))
-    print("Black Height:", rb_tree.get_black_height())
+# -------- Example Usage --------
+rb_tree = RedBlackTree()
+rb_tree.insert(10)
+rb_tree.insert(20)
+rb_tree.insert(30)
+
+print("Red-Black Tree structure:")
+rb_tree.print_tree()
+
+print("Black height:", rb_tree.get_black_height())
+
+node = rb_tree.search(20)
+if node != rb_tree.TNULL:
+    print(f"Node {node.value} found with color {node.color}")
+else:
+    print("Node not found")
