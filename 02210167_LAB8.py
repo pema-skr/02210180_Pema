@@ -1,7 +1,7 @@
 # YourStudentNo_LAB9.py
 # LAB 8 – Part 2: Red-Black Tree
 # Implemented by: 02210167 Jigme Choden Ghalley
-# Partner: 02210180 Pema TChecki 
+# Partner: 02210180 Pema Checki 
 
 
 class RedBlackTree:
